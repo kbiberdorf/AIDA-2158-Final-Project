@@ -1,6 +1,8 @@
 # AIDA 2158A Final Project — Presentation Package
 **Student(s):** Mark, Kelsey, Herve
+
 **Course:** Neural Networks and Deep Learning — Dr. M. Tufail, Red Deer Polytechnic
+
 **Date:** April 2026
 
 ---
@@ -23,9 +25,11 @@ This folder contains everything the team needs to build a presentation.
 A complete deep learning pipeline for robotic strawberry harvesting:
 
 ```
-Field photo → YOLOv11 detects strawberries → Crop around target fruit
-           → U-Net segments the stem → PCA extracts stem angle
-           → Gripper alignment angle for robot arm
+Field photo → YOLOv11 detects strawberries 
+            → Crop around target fruit
+            → U-Net segments the stem 
+            → PCA extracts stem angle
+            → Gripper alignment angle for robot arm
 ```
 
 ---
@@ -83,7 +87,7 @@ The full written project report. Covers all four modules, all results with numbe
 ---
 
 ### `Phase4_Peduncle_Annotation/`
-**What:** All four team members manually annotated the crown–stem–peduncle region using Roboflow + SAM. 357 annotated image/mask pairs produced.
+**What:** All team members manually annotated the crown–stem–peduncle region using Roboflow + SAM. 357 annotated image/mask pairs produced.
 **Key result:** 357 pairs total — 3.5× the 100-image minimum required by the spec.
 
 | File | Use for |
