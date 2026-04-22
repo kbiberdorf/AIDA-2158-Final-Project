@@ -35,7 +35,7 @@ This follows the project specification exactly (Section 6 — Important Annotati
 
 ---
 
-## Annotation Method (Mark Miller)
+## Annotation Method
 
 1. Uploaded 96 images from the shared dataset to `app.roboflow.com`
 2. Used **SAM3 Smart Polygon** mode — hover over peduncle region, SAM auto-generates mask
