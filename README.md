@@ -94,6 +94,62 @@ Notes on the V2 U-Net — architecture, training runs, file locations, and slide
 
 ---
 
+## Environment Setup
+
+All notebooks run in the `aida_stable` conda environment. The steps below recreate it from scratch.
+
+### Requirements
+
+| Component | Version |
+|-----------|---------|
+| Python | 3.11.14 |
+| PyTorch | 2.10.0+cu128 |
+| Ultralytics (YOLOv11) | 8.3.235 |
+| NumPy | 2.2.6 |
+| Pandas | 3.0.2 |
+| OpenCV (`opencv-python`) | 4.12.0 |
+| Pillow | 12.0.0 |
+| Matplotlib | 3.10.7 |
+| Scikit-learn | 1.8.0 |
+| Seaborn | 0.13.2 |
+| ipykernel | 7.1.0 |
+
+**GPU:** NVIDIA GeForce RTX 5070 Laptop GPU, CUDA 12.8. A CUDA-capable GPU is required — CPU-only training would take hours per YOLO epoch.
+
+### Steps
+
+**1. Create and activate the conda environment**
+```bash
+conda create -n aida_stable python=3.11.14
+conda activate aida_stable
+```
+
+**2. Install PyTorch with CUDA 12.8 support**
+
+Visit [pytorch.org](https://pytorch.org/get-started/locally/) and select your OS, conda/pip, and CUDA 12.8 to get the correct install command. The version used in this project was `2.10.0+cu128`.
+
+**3. Install Ultralytics (YOLOv11)**
+```bash
+pip install ultralytics==8.3.235
+```
+
+**4. Install remaining packages**
+```bash
+pip install numpy==2.2.6 pandas==3.0.2 opencv-python==4.12.0 pillow==12.0.0 matplotlib==3.10.7 scikit-learn==1.8.0 seaborn==0.13.2
+```
+
+**5. Register the Jupyter kernel**
+```bash
+pip install ipykernel==7.1.0
+python -m ipykernel install --user --name aida_stable --display-name "Python (aida_stable)"
+```
+
+**6. Select the kernel in Jupyter**
+
+When opening any notebook, select **"Python (aida_stable)"** as the kernel.
+
+---
+
 ## Run Order (if re-running from scratch)
 
 1. `module1_yolov11_training.ipynb` — only if YOLO weights (`best.pt`) are missing
