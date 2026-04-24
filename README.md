@@ -1,4 +1,4 @@
-# AIDA 2158A Final Project — Presentation Package
+# AIDA 2158A Final Project — Strawberry Harvesting Pipeline
 **Student(s):** Mark, Kelsey, Herve
 
 **Course:** Neural Networks and Deep Learning — Dr. M. Tufail, Red Deer Polytechnic
@@ -7,28 +7,16 @@
 
 ---
 
-## How to Use This Package
-
-This folder contains everything the team needs to build a presentation.
-
-**Start here:**
-1. Read `FINAL_REPORT.md` in this folder — it is the complete written report covering all phases with results, numbers, and analysis
-2. Open each phase folder — each one has a `NOTES.md` with talking points and a description of every file inside it
-3. Use the images and charts from each folder as slides
-
-**Each phase folder is self-contained.** You do not need to open any notebooks or run any code. All outputs (charts, images, data) are already pre-generated and copied in.
-
----
-
 ## What Was Built
 
-A complete deep learning pipeline for robotic strawberry harvesting:
+A complete deep learning pipeline for robotic strawberry harvesting, built and validated in two versions:
 
 ```
-Field photo → YOLOv11 detects strawberries 
-            → Crop around target fruit
-            → U-Net segments the stem 
-            → PCA extracts stem angle
+Field photo → YOLOv11 detects all strawberries
+            → Per-fruit ROI crop (asymmetric padding)
+            → 3-class U-Net segments background / fruit / peduncle
+            → Largest connected component filter
+            → PCA extracts stem angle → normalised to [−90°, +90°]
             → Gripper alignment angle for robot arm
 ```
 
@@ -36,120 +24,115 @@ Field photo → YOLOv11 detects strawberries
 
 ## Folder Guide
 
-### `FINAL_REPORT.md`
-The full written project report. Covers all four modules, all results with numbers, honest analysis of limitations, and a rubric self-assessment. **Read this first.**
+### `V1 Files/` — Original Pipeline (Baseline)
+
+The first complete pipeline run. Each phase folder contains a `NOTES.md`, a notebook, and all generated output images.
+
+| Folder | What it contains |
+|--------|-----------------|
+| `Phase1_Environment/` | Environment setup — RTX 5070, PyTorch + CUDA confirmed, `aida_stable` env |
+| `Phase2_YOLOv11_Training/` | YOLOv11-seg trained on 2,800 images — mAP50 0.927 (box), 0.918 (mask) |
+| `Phase3_ROI_Crops/` | Largest-fruit crops — 3,100 / 3,100 images processed |
+| `Phase4_Peduncle_Annotation/` | 357 annotated pairs from 4 contributors (3.5× the 100-image minimum) |
+| `Phase5_UNet_Training/` | Binary U-Net on full images — best val IoU 0.2291 at epoch 10/50 |
+| `Phase6_Stem_Angle/` | PCA on binary mask predictions — 50/57 angles (87.7%), mean 59.2° |
+
+**Key V1 outputs to note:**
+- `Phase2_YOLOv11_Training/training_curves.png` — loss and mAP over 48 epochs
+- `Phase2_YOLOv11_Training/val_predictions_sample.png` — predicted masks overlaid on val images
+- `Phase5_UNet_Training/unet_training_curves.png` — shows overfitting after epoch 10
+- `Phase6_Stem_Angle/v2_stem_angle_examples.png` — post-processed PCA overlays
+- `Phase6_Stem_Angle/v2_stem_angle_distribution.png` — histogram + rose diagram
 
 ---
 
-### `Phase1_Environment/`
-**What:** Verified the Python/CUDA environment and installed all required packages.
-**Key result:** NVIDIA RTX 5070 GPU confirmed, PyTorch + CUDA working, all packages installed.
-| File | Use for |
-|---|---|
-| `NOTES.md` | Summary of environment setup, package versions, why `aida_stable` was chosen |
-| `FINAL_REPORT.md` | Full report (same in every folder) |
+### `V2 Files/` — Upgraded Pipeline (Final)
+
+V2 reframes the segmentation task as **three-class** (background / strawberry / peduncle) and trains on **per-fruit ROI crops** instead of full images. This gives the model structural context and eliminates the class-imbalance problem where peduncle pixels occupied less than 5% of each full frame.
+
+#### Documents
+
+| File | What it is |
+|------|-----------|
+| `FINAL_REPORT_V2.md` | **Read this first** — complete written report covering all modules with all V2 results and analysis |
+| `V2_GUIDE.md` | Technical reference — every change from V1 to V2, why each was made, measured differentials, and the three-run weight tuning journey |
+| `MODULE_V2_RETRAIN_JUSTIFICATION.md` | The case for retraining — problem statement, decision rationale |
+| `PRESENTATION_UPDATE_GUIDE.md` | Slide-by-slide instructions for updating the existing PowerPoint deck with V2 numbers |
+
+#### Notebooks
+
+| File | What it runs |
+|------|-------------|
+| `module1_yolov11_training.ipynb` | YOLO training (unchanged from V1 — same weights used) |
+| `module2_v2_multiclass_masks.ipynb` | Per-fruit ROI crops + 3-class pixel labels (BG/fruit/peduncle) |
+| `module3_v2_unet_multiclass.ipynb` | 3-class U-Net training with class-weighted loss |
+
+**PDF screenshots** of notebooks 2, 3, and 4 are in `V2 Files/` for reference without running code.
+
+#### `Phase5_UNet_v2/`
+
+Notes on the V2 U-Net — architecture, training runs, file locations, and slide update instructions.
+
+#### `unet_v2/`
+
+| File | What it is |
+|------|-----------|
+| `unet_v2_training_curves.png` | **Slide: show this** — train vs val loss and mIoU, best at epoch 22/27 |
+| `unet_v2_predictions.png` | **Slide: show this** — qualitative predictions (original / GT / predicted / overlay) |
+| `unet_v2_confusion_matrix.png` | **Slide: show this** — full 3×3 confusion matrix (BG / strawberry / peduncle) |
+| `best_unet_v2.pt` | Trained model weights (tracked via Git LFS) |
+| `confusion_val.csv` | Raw confusion counts |
+| `val_split_v2.json` | Which crops were in the val set (reproducibility) |
+
+#### `stem_angles_v3/`
+
+| File | What it is |
+|------|-----------|
+| `stem_v3_examples.png` | **Slide: show this** — PCA axis overlays from V2 peduncle predictions |
+| `stem_v3_dist.png` | **Slide: show this** — angle histogram after V2 (normalised to [−90°, +90°]) |
+| `stem_angles_v3.json` | Per-crop angle data (all 192 val crops) |
 
 ---
 
-### `Phase2_YOLOv11_Training/`
-**What:** Trained YOLOv11 segmentation model on 2,800 strawberry images.
-**Key result:** mAP50 = 0.927 (detection), 0.918 (segmentation masks) — excellent accuracy.
+## Run Order (if re-running from scratch)
 
-| File | Use for |
-|---|---|
-| `NOTES.md` | Talking points, hyperparameter table, results explained |
-| `training_curves.png` | **Slide: show this** — loss and mAP over 48 epochs |
-| `val_predictions_sample.png` | **Slide: show this** — 6 images with predicted masks overlaid |
-| `confusion_matrix_normalized.png` | **Slide: show this** — how well the model classifies |
-| `val_batch0_pred.jpg` / `val_batch1_pred.jpg` | Additional prediction examples |
-| `BoxPR_curve.png` / `MaskPR_curve.png` | Precision-recall curves (box and mask) |
-| `BoxP_curve.png` / `BoxR_curve.png` | Precision and recall curves individually (box) |
-| `MaskP_curve.png` / `MaskR_curve.png` | Precision and recall curves individually (mask) |
-| `results.png` | YOLO auto-generated results grid (all metrics per epoch) |
-| `train_batch0.jpg` / `train_batch1.jpg` / `train_batch2.jpg` | Sample augmented training batches |
-| `train_batch14000.jpg` / `train_batch14001.jpg` / `train_batch14002.jpg` | Late-epoch training batches |
-| `val_batch2_labels.jpg` / `val_batch2_pred.jpg` | Additional val batch ground truth vs predictions |
-| `results.csv` | Raw per-epoch numbers (open in Excel) |
-| `module1_yolov11_training.ipynb` | Full code notebook |
+1. `module1_yolov11_training.ipynb` — only if YOLO weights (`best.pt`) are missing
+2. `module2_v2_multiclass_masks.ipynb` — regenerates all 3-class masks and per-fruit crops
+3. `module3_v2_unet_multiclass.ipynb` — trains the 3-class U-Net
+4. *(Module 4 notebook)* — runs PCA angle extraction on V2 predictions
 
----
-
-### `Phase3_ROI_Crops/`
-**What:** Used the trained YOLOv11 model to automatically crop a tight region around the largest strawberry in every image.
-**Key result:** 3,100 / 3,100 images successfully cropped.
-
-| File | Use for |
-|---|---|
-| `NOTES.md` | Talking points, method, confidence threshold decision explained |
-| `roi_crops_sample.png` | **Slide: show this** — grid of sample crops |
-| `module1_yolov11_training.ipynb` | Full code notebook (same as Phase 2 — ROI code is Cell 9) |
-
----
-
-### `Phase4_Peduncle_Annotation/`
-**What:** All team members manually annotated the crown–stem–peduncle region using Roboflow + SAM. 357 annotated image/mask pairs produced.
-**Key result:** 357 pairs total — 3.5× the 100-image minimum required by the spec.
-
-| File | Use for |
-|---|---|
-| `NOTES.md` | Talking points, contributor breakdown, annotation method, format differences |
-| `annotation_sample.png` | **Slide: show this** — 9 images with mask overlays |
-| `contributor_breakdown.png` | **Slide: show this** — bar chart of annotations per contributor |
-| `module2_peduncle_annotation.ipynb` | Full code notebook |
-
----
-
-### `Phase5_UNet_Training/`
-**What:** Trained a U-Net neural network to automatically segment the crown–stem–peduncle region.
-**Key result:** Best val IoU = 0.2291 at epoch 10. Overfitting observed after epoch 10 — documented and explained.
-
-| File | Use for |
-|---|---|
-| `NOTES.md` | Talking points, architecture, hyperparameters, honest assessment of results |
-| `unet_training_curves.png` | **Slide: show this** — point out peak at epoch 10, then overfitting |
-| `unet_predictions.png` | **Slide: show this** — 6 val images: original / ground truth / prediction / overlay |
-| `module3_unet_training.ipynb` | Full code notebook |
-
----
-
-### `Phase6_Stem_Angle/`
-**What:** Applied PCA to U-Net predicted masks to extract the stem orientation angle — the robotic gripper alignment direction.
-**Key result:** Mean stem angle 59.2° from horizontal across 50 val images. Before/after post-processing comparison included.
-
-| File | Use for |
-|---|---|
-| `NOTES.md` | Talking points, what PCA is, v1 vs v2 comparison, angle interpretation |
-| `v1_stem_angle_examples.png` | **Slide: show this first** — raw results showing noise problem |
-| `v2_stem_angle_examples.png` | **Slide: show this second** — post-processed, cleaner axis lines |
-| `v2_stem_angle_distribution.png` | **Slide: show this** — histogram + rose diagram of grasp directions |
-| `v1_stem_angle_distribution.png` | v1 distribution for comparison |
-| `v2_stem_angles.json` | Per-image angle data (all 57 val images) |
-| `module4_stem_angle.ipynb` | Full code notebook |
+If only the U-Net needs retraining, start at step 3. If only the angle extraction needs updating, start at step 4.
 
 ---
 
 ## Suggested Presentation Slide Order
 
-1. **Title slide** — project name, team, course
-2. **Pipeline overview** — one diagram showing the 4-stage flow (in `FINAL_REPORT.md` Section 10)
-3. **Phase 2: YOLOv11** — `training_curves.png` + `val_predictions_sample.png`
-4. **Phase 3: ROI Crops** — `roi_crops_sample.png`
-5. **Phase 4: Annotation** — `annotation_sample.png` + `contributor_breakdown.png`
-6. **Phase 5: U-Net** — `unet_training_curves.png` + `unet_predictions.png`
-7. **Phase 6: Stem Angle** — `v1_stem_angle_examples.png` → `v2_stem_angle_examples.png` → `v2_stem_angle_distribution.png`
-8. **Results summary** — table from `FINAL_REPORT.md` Section 8 (rubric self-assessment)
-9. **Limitations and future work** — `FINAL_REPORT.md` Section 9
+1. **Title slide** — project name, team, course; add "V2: Multi-Class Segmentation on ROI Crops"
+2. **Pipeline overview** — 5-stage flow diagram from `FINAL_REPORT_V2.md`
+3. **Module 1: YOLO** — `training_curves.png` + `val_predictions_sample.png` (from `V1 Files/Phase2_YOLOv11_Training/`)
+4. **Module 2: Annotation + V2 masks** — `annotation_sample.png` + `contributor_breakdown.png` (from `V1 Files/Phase4_Peduncle_Annotation/`)
+5. **Module 3: V1 vs V2 U-Net** — show `unet_training_curves.png` (V1) alongside `unet_v2_training_curves.png` (V2); then `unet_v2_confusion_matrix.png`
+6. **Module 3: Problems and fixes** — V1 identified 4 problems; V2 implemented all 4 fixes (see `PRESENTATION_UPDATE_GUIDE.md` Slide 15)
+7. **Module 4: Stem angle** — `stem_v3_examples.png` → `stem_v3_dist.png`
+8. **Results summary** — V1 vs V2 comparison table (see Key Numbers below)
+9. **Limitations and future work** — peduncle precision (23.4%); larger annotated dataset; pretrained encoders
 
 ---
 
-## Key Numbers to Quote
+## Key Numbers
 
-| Metric | Value |
-|---|---|
-| YOLOv11 mAP50 (detection) | 0.927 |
-| YOLOv11 mAP50 (segmentation) | 0.918 |
-| ROI crops generated | 3,100 / 3,100 |
-| Peduncle annotations | 357 pairs (4 contributors) |
-| U-Net best val IoU | 0.2291 (epoch 10 / 50) |
-| Stem angles extracted | 50 / 57 val images |
-| Mean stem angle | 59.2° from horizontal |
+| Metric | V1 | V2 |
+|--------|----|----|
+| YOLOv11 mAP50 (box) | 0.927 | 0.927 (unchanged) |
+| YOLOv11 mAP50 (mask) | 0.918 | 0.918 (unchanged) |
+| Annotations | 357 pairs (4 contributors) | 357 pairs (4 contributors) |
+| U-Net task | Binary (peduncle / not) | 3-class (BG / fruit / peduncle) |
+| U-Net training input | Full 1008×756 images | Per-fruit 256×256 ROI crops |
+| Best val metric | IoU 0.2291 (epoch 10/50) | mIoU 0.5843 (epoch 22/27) |
+| Peduncle IoU | — | 0.195 |
+| Peduncle recall | — | 54.0% (+20.5 ppts over unweighted) |
+| Confusion matrix | 2×2 (near-empty) | 3×3 (interpretable) |
+| Val set size | 57 images — 1 annotator | 192 crops — all 4 annotators |
+| Valid angles produced | 50 / 57 (87.7%) | 178 / 192 (92.7%) |
+| Angle range | 0°–180° (sign-ambiguous) | −43.85° to +81.89° (normalised) |
+| Mean angle | 59.2° | 12.36° |
