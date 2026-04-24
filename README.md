@@ -77,9 +77,9 @@ Notes on the V2 U-Net — architecture, training runs, file locations, and slide
 
 | File | What it is |
 |------|-----------|
-| `unet_v2_training_curves.png` | **Slide: show this** — train vs val loss and mIoU, best at epoch 22/27 |
-| `unet_v2_predictions.png` | **Slide: show this** — qualitative predictions (original / GT / predicted / overlay) |
-| `unet_v2_confusion_matrix.png` | **Slide: show this** — full 3×3 confusion matrix (BG / strawberry / peduncle) |
+| `unet_v2_training_curves.png` | — train vs val loss and mIoU, best at epoch 22/27 |
+| `unet_v2_predictions.png` | — qualitative predictions (original / GT / predicted / overlay) |
+| `unet_v2_confusion_matrix.png` | — full 3×3 confusion matrix (BG / strawberry / peduncle) |
 | `best_unet_v2.pt` | Trained model weights (tracked via Git LFS) |
 | `confusion_val.csv` | Raw confusion counts |
 | `val_split_v2.json` | Which crops were in the val set (reproducibility) |
@@ -88,8 +88,8 @@ Notes on the V2 U-Net — architecture, training runs, file locations, and slide
 
 | File | What it is |
 |------|-----------|
-| `stem_v3_examples.png` | **Slide: show this** — PCA axis overlays from V2 peduncle predictions |
-| `stem_v3_dist.png` | **Slide: show this** — angle histogram after V2 (normalised to [−90°, +90°]) |
+| `stem_v3_examples.png` | — PCA axis overlays from V2 peduncle predictions |
+| `stem_v3_dist.png` | — angle histogram after V2 (normalised to [−90°, +90°]) |
 | `stem_angles_v3.json` | Per-crop angle data (all 192 val crops) |
 
 ---
@@ -102,20 +102,6 @@ Notes on the V2 U-Net — architecture, training runs, file locations, and slide
 4. *(Module 4 notebook)* — runs PCA angle extraction on V2 predictions
 
 If only the U-Net needs retraining, start at step 3. If only the angle extraction needs updating, start at step 4.
-
----
-
-## Suggested Presentation Slide Order
-
-1. **Title slide** — project name, team, course; add "V2: Multi-Class Segmentation on ROI Crops"
-2. **Pipeline overview** — 5-stage flow diagram from `FINAL_REPORT_V2.md`
-3. **Module 1: YOLO** — `training_curves.png` + `val_predictions_sample.png` (from `V1 Files/Phase2_YOLOv11_Training/`)
-4. **Module 2: Annotation + V2 masks** — `annotation_sample.png` + `contributor_breakdown.png` (from `V1 Files/Phase4_Peduncle_Annotation/`)
-5. **Module 3: V1 vs V2 U-Net** — show `unet_training_curves.png` (V1) alongside `unet_v2_training_curves.png` (V2); then `unet_v2_confusion_matrix.png`
-6. **Module 3: Problems and fixes** — V1 identified 4 problems; V2 implemented all 4 fixes (see `PRESENTATION_UPDATE_GUIDE.md` Slide 15)
-7. **Module 4: Stem angle** — `stem_v3_examples.png` → `stem_v3_dist.png`
-8. **Results summary** — V1 vs V2 comparison table (see Key Numbers below)
-9. **Limitations and future work** — peduncle precision (23.4%); larger annotated dataset; pretrained encoders
 
 ---
 
