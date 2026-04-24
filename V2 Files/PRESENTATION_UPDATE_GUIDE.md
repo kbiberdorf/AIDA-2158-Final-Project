@@ -48,7 +48,7 @@
 
 **Replace with:**
 
-> The dataset consists of 3,100 annotated strawberry images and 357 manually annotated stem masks generated using SAM-assisted tools. The pipeline was built and validated in two versions. V1 trained a binary U-Net on full images. V2 extended this to a three-class model (background / strawberry body / peduncle) trained on tight per-fruit ROI crops, improving peduncle recall by 20 percentage points and increasing stem angle extraction coverage from 87.7% to 92.7%.
+> The dataset consists of 3,100 annotated strawberry images and 279 unique manually annotated stem masks generated using SAM-assisted tools. The pipeline was built and validated in two versions. V1 trained a binary U-Net on full images. V2 extended this to a three-class model (background / strawberry body / peduncle) trained on tight per-fruit ROI crops, improving peduncle recall by 20 percentage points and increasing stem angle extraction coverage from 87.7% to 92.7%.
 
 ---
 
@@ -112,7 +112,7 @@
 **Add** a second paragraph or callout box labelled "V2 Upgrade":
 
 > **V2 — Three-Class Masks on ROI Crops**
-> In V2, the same 357 annotated images are processed differently. YOLO detects every fruit in each image and generates one tight crop per fruit. Within each crop, pixel labels are assigned: strawberry regions identified via HSV colour thresholding (class 1), peduncle polygons from the YOLO annotations (class 2), and everything else as background (class 0). Peduncle labels are written last, overwriting any strawberry pixels beneath them to prevent suppression.
+> In V2, the same 279 annotated images are processed differently. YOLO detects every fruit in each image and generates one tight crop per fruit. Within each crop, pixel labels are assigned: strawberry regions identified via HSV colour thresholding (class 1), peduncle polygons from the YOLO annotations (class 2), and everything else as background (class 0). Peduncle labels are written last, overwriting any strawberry pixels beneath them to prevent suppression.
 
 ---
 
@@ -214,11 +214,11 @@
 | Validation set | 57 images — 1 annotator | 192 crops — all 4 annotators |
 | Valid angles produced | 50 / 57 **(87.7%)** | 178 / 192 **(92.7%)** |
 | Null rate (no peduncle found) | 12.3% | **7.3%** |
-| Angle range | 0°–180° (sign-ambiguous) | −43.85° to +81.89° (normalised) |
-| Mean angle | 59.2° | 12.36° |
+| Angle range | 0°–180° (sign-ambiguous) | −89.15° to +88.01° (normalised) |
+| Mean angle | 59.2° | -3.8° |
 | Reference frame | Inconsistent | Consistent [−90°, +90°] |
 
-> **Note on mean angle difference:** V2's mean of 12.36° vs. V1's 59.2° reflects two factors: (1) angle normalisation folds values above 90° to their equivalent negative angles, and (2) V2 evaluates a diverse 4-annotator set vs. V1's single-annotator images. Both distributions are physically plausible.
+> **Note on mean angle difference:** V2's mean of -3.8° vs. V1's 59.2° reflects two factors: (1) angle normalisation maps outputs to a consistent [−90°, +90°] reference frame, and (2) V2 evaluates a diverse 4-annotator set vs. V1's single-annotator images. Both distributions are physically plausible.
 
 ---
 
@@ -227,7 +227,7 @@
 
 **Replace with:**
 
-> YOLOv11 reached mAP50 of 0.927 (box) and 0.918 (mask), and generated ROI crops for all 3,100 images — unchanged in V2. Four contributors produced 357 annotated masks, 3.5× the minimum.
+> YOLOv11 reached mAP50 of 0.927 (box) and 0.918 (mask), and generated ROI crops for all 3,100 images — unchanged in V2. Four contributors produced 279 unique annotated masks, 2.79× the minimum.
 >
 > **V2 U-Net:** Three-class model (background / strawberry / peduncle) trained on per-fruit ROI crops. Best val mIoU: 0.5843 at epoch 22. Per-class IoU: BG 0.772, Fruit 0.787, Peduncle 0.195. Peduncle recall: 54.0% — up from 33.5% unweighted baseline, a +20.5 percentage point gain from inverse-frequency class weighting capped at 12×.
 >

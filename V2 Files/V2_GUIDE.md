@@ -67,7 +67,7 @@ This section states what specifically changed, why it changed, and how large the
 | Validation set size | 57 images (1 annotator) | 192 crops (4 annotators) | 3.4× more, and stratified |
 | Valid angles produced | 50 (87.7%) | **178 (92.7%)** | **+5.0 percentage points** |
 | No-peduncle-found | 7 (12.3%) | 14 (7.3%) | Null rate halved |
-| Angle range | −? to +? (unfolded) | −43.85° to +81.89° (folded) | Consistent reference frame |
+| Angle range | −? to +? (unfolded) | −89.15° to +88.01° | Consistent reference frame |
 
 > **Why direct V1-vs-V2 IoU comparison is not presented:** V1 measured a single binary IoU (peduncle vs. not-peduncle, on full 1008×756 images, 57-image val from 1 annotator). V2 measures per-class IoU on 3-class predictions on 256×256 ROI crops, 192-crop val from all 4 contributors. Comparing 0.2291 (v1 binary) to 0.195 (v2 peduncle class) would imply the model got worse — the opposite is true. The V1 task was easier because the background class dominated the loss, making it cheap to achieve modest binary IoU. V2 forces the model to simultaneously learn two hard boundaries. The within-v2 comparison (unweighted → weighted) is the clean measurement of what the class-weighting optimisation did.
 
@@ -362,12 +362,10 @@ The 12× cap was the optimal weight. The 26× run over-corrected (20% of backgro
 | Total validation crops | 192 |
 | Valid angles produced | 178 (92.7%) |
 | Null (no peduncle found) | 14 (7.3%) |
-| Angle range | -43.85° to 126.89° |
-| Mean angle | 12.36° |
+| Angle range | -89.15° to +88.01° |
+| Mean angle | -3.8° |
 
-**16 crops had raw angles above 90°.** These were not bad predictions. PCA is sign-ambiguous — the model correctly identified the peduncle axis, but the eigenvector pointed the other way along it. Subtracting 180° collapses them to equivalent negative angles (e.g., 118 deg becomes -62 deg). The visualisation line does not change; only the reported angle value is made consistent for downstream use.
-
-**Final distribution (post-fold):** all 178 valid angles lie within [-43.85°, +81.89°]. 147 of 178 (82.6%) fall within ±45° of vertical — physically expected for upright strawberry stems.
+The final run produced no raw angles outside ±90°, so the folding step did not alter any values. All 178 valid angles lie within [−89.15°, +88.01°] as stored. The visualisation line is unaffected.
 
 ### Coverage interpretation
 
@@ -375,7 +373,7 @@ The 12× cap was the optimal weight. The 26× run over-corrected (20% of backgro
 
 ### Angle distribution interpretation
 
-All 178 angles lie within a clean [-43.85°, +81.89°] range after folding. 147 of 178 (82.6%) fall within ±45° of vertical — physically expected for upright or slightly-tilted strawberry stems. The spread reflects genuine variation in camera angle and fruit orientation across the four contributor datasets.
+All 178 angles lie within [−89.15°, +88.01°]. The spread reflects genuine variation in camera angle and fruit orientation across the four contributor datasets.
 
 ---
 
@@ -386,5 +384,5 @@ All 178 angles lie within a clean [-43.85°, +81.89°] range after folding. 147 
 - [x] Evaluate weight tuning — **settled at 12× cap after testing 26× (too aggressive)**
 - [x] Run Module 4 v2 — **complete: 178/192 valid angles, 92.7% coverage**
 - [x] Add angle normalization to [-90°, +90°] — **done in `pca_ang`**
-- [x] Re-run Module 4 v2 with normalization — **done: all 178 angles fold cleanly into [-43.85°, +81.89°]**
+- [x] Re-run Module 4 v2 with normalization — **done: all 178 angles within [−89.15°, +88.01°]; no values exceeded ±90° in final run**
 - [x] Update final report with v2 metrics — **see `FINAL_REPORT_V2.md`**

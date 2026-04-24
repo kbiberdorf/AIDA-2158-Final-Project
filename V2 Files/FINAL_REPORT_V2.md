@@ -386,11 +386,10 @@ This does not change the line drawn on the visualisation; it only makes the repo
 | Total validation crops | 192 |
 | Valid angles produced | **178 (92.7%)** |
 | Null (no peduncle found) | 14 (7.3%) |
-| Raw range before folding | −43.85° to +126.89° |
-| Final range after folding | −43.85° to +81.89° |
-| Mean angle (post-fold) | 12.36° |
+| Angle range | −89.15° to +88.01° |
+| Mean angle | -3.8° |
 
-16 crops had raw angles above 90° — sign-ambiguity artefacts, not bad predictions. After folding, all 178 angles are within [−43.85°, +81.89°]. 147 of 178 (82.6%) are within ±45° of vertical, consistent with natural strawberry stem growth.
+All 178 valid angles lie within [−89.15°, +88.01°]. No values exceeded ±90°, so the folding step did not alter any outputs in the final run.
 
 ### 8.3 Key Artefacts
 
@@ -550,7 +549,7 @@ argmax(class=2) → largest connected component → peduncle mask
         │
         ▼
 [PCA + angle folding to −90°/+90°] ── Coverage: 178/192 (92.7%)
-                                       Mean angle: 12.36°
+                                       Mean angle: -3.8°
         │
         ▼
 Consistent gripper alignment angle (robot-controller safe)

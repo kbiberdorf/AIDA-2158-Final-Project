@@ -33,7 +33,7 @@ The first complete pipeline run. Each phase folder contains a `NOTES.md`, a note
 | `Phase1_Environment/` | Environment setup — RTX 5070, PyTorch + CUDA confirmed, `aida_stable` env |
 | `Phase2_YOLOv11_Training/` | YOLOv11-seg trained on 2,800 images — mAP50 0.927 (box), 0.918 (mask) |
 | `Phase3_ROI_Crops/` | Largest-fruit crops — 3,100 / 3,100 images processed |
-| `Phase4_Peduncle_Annotation/` | 357 annotated pairs from 4 contributors (3.5× the 100-image minimum) |
+| `Phase4_Peduncle_Annotation/` | 279 unique manually annotated pairs from 4 contributors (2.79× the 100-image minimum) |
 | `Phase5_UNet_Training/` | Binary U-Net on full images — best val IoU 0.2291 at epoch 10/50 |
 | `Phase6_Stem_Angle/` | PCA on binary mask predictions — 50/57 angles (87.7%), mean 59.2° |
 
@@ -111,7 +111,7 @@ If only the U-Net needs retraining, start at step 3. If only the angle extractio
 |--------|----|----|
 | YOLOv11 mAP50 (box) | 0.927 | 0.927 (unchanged) |
 | YOLOv11 mAP50 (mask) | 0.918 | 0.918 (unchanged) |
-| Annotations | 357 pairs (4 contributors) | 357 pairs (4 contributors) |
+| Annotations | 279 unique manually annotated pairs | 279 unique manually annotated pairs |
 | U-Net task | Binary (peduncle / not) | 3-class (BG / fruit / peduncle) |
 | U-Net training input | Full 1008×756 images | Per-fruit 256×256 ROI crops |
 | Best val metric | IoU 0.2291 (epoch 10/50) | mIoU 0.5843 (epoch 22/27) |
@@ -120,5 +120,5 @@ If only the U-Net needs retraining, start at step 3. If only the angle extractio
 | Confusion matrix | 2×2 (near-empty) | 3×3 (interpretable) |
 | Val set size | 57 images — 1 annotator | 192 crops — all 4 annotators |
 | Valid angles produced | 50 / 57 (87.7%) | 178 / 192 (92.7%) |
-| Angle range | 0°–180° (sign-ambiguous) | −43.85° to +81.89° (normalised) |
-| Mean angle | 59.2° | 12.36° |
+| Angle range | 0°–180° (sign-ambiguous) | −89.15° to +88.01° (normalised) |
+| Mean angle | 59.2° | -3.8° |
